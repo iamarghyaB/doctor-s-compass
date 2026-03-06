@@ -1,21 +1,29 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import {
-  Search, Pill, Radiation, ShieldCheck, Stethoscope, HeartHandshake,
+  Search, Pill, Radiation, ShieldCheck, Stethoscope, HeartHandshake, type LucideIcon,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
-const services = [
-  { icon: Search, title: "Cancer Diagnosis & Screening", desc: "Comprehensive screening with advanced imaging and biopsy techniques for early cancer detection." },
-  { icon: Pill, title: "Chemotherapy", desc: "Personalized chemotherapy regimens designed to maximize effectiveness while minimizing side effects." },
-  { icon: Radiation, title: "Radiation Therapy", desc: "State-of-the-art radiation treatments including IMRT and stereotactic radiosurgery." },
-  { icon: ShieldCheck, title: "Immunotherapy", desc: "Cutting-edge immunotherapy treatments that harness your body's immune system to fight cancer." },
-  { icon: Stethoscope, title: "Surgical Oncology Consultation", desc: "Expert surgical planning and consultation for tumor removal and cancer staging." },
-  { icon: HeartHandshake, title: "Palliative Care", desc: "Compassionate symptom management and quality of life support throughout treatment." },
-];
+type Service = Tables<"services">;
+
+const iconMap: Record<string, LucideIcon> = {
+  Search, Pill, Radiation, ShieldCheck, Stethoscope, HeartHandshake,
+};
 
 const ServicesSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
+  const [services, setServices] = useState<Service[]>([]);
+
+  useEffect(() => {
+    supabase.from("services").select("*").order("sort_order").then(({ data }) => {
+      if (data) setServices(data);
+    });
+  }, []);
+
+  if (services.length === 0) return null;
 
   return (
     <section id="services" className="section-padding" ref={ref}>
@@ -27,22 +35,25 @@ const ServicesSection = () => {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((s, i) => (
-            <motion.div
-              key={s.title}
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.1 }}
-              className="group bg-card rounded-xl p-6 border border-border/50 shadow-sm hover:shadow-lg hover:border-accent/30 transition-all duration-300"
-            >
-              <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
-                <s.icon className="h-6 w-6 text-accent" />
-              </div>
-              <h3 className="font-heading text-lg font-semibold text-primary mb-2">{s.title}</h3>
-              <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{s.desc}</p>
-              <button className="text-accent text-sm font-semibold hover:underline">Learn More →</button>
-            </motion.div>
-          ))}
+          {services.map((s, i) => {
+            const Icon = iconMap[s.icon] || Stethoscope;
+            return (
+              <motion.div
+                key={s.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: i * 0.1 }}
+                className="group bg-card rounded-xl p-6 border border-border/50 shadow-sm hover:shadow-lg hover:border-accent/30 transition-all duration-300"
+              >
+                <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
+                  <Icon className="h-6 w-6 text-accent" />
+                </div>
+                <h3 className="font-heading text-lg font-semibold text-primary mb-2">{s.title}</h3>
+                <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{s.description}</p>
+                <button className="text-accent text-sm font-semibold hover:underline">Learn More →</button>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Users, Clock, Award, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import doctorImg from "@/assets/doctor-hero.jpg";
 
 const stats = [
@@ -11,13 +13,27 @@ const stats = [
 ];
 
 const HeroSection = () => {
+  const [content, setContent] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    supabase.from("site_content").select("*").eq("section", "hero").then(({ data }) => {
+      if (data) {
+        const map: Record<string, string> = {};
+        data.forEach((d) => (map[d.key] = d.value));
+        setContent(map);
+      }
+    });
+  }, []);
+
+  const headline = content.headline || "Fighting Cancer With Science & Compassion";
+  const subtext = content.subtext || "Providing specialized oncology care with cutting-edge treatments and a patient-first approach. Because every life deserves the best chance.";
+
   const scrollTo = (id: string) =>
     document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <section id="home" className="relative min-h-screen gradient-hero overflow-hidden">
       <div className="container mx-auto px-4 pt-28 md:pt-36 pb-16 flex flex-col lg:flex-row items-center gap-12 lg:gap-8">
-        {/* Left */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
@@ -28,32 +44,21 @@ const HeroSection = () => {
             Senior Oncologist & Cancer Specialist
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-primary leading-tight mb-6">
-            Fighting Cancer With Science & Compassion
+            {headline}
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mb-8 mx-auto lg:mx-0">
-            Providing specialized oncology care with cutting-edge treatments and a
-            patient-first approach. Because every life deserves the best chance.
+            {subtext}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <Button
-              size="lg"
-              onClick={() => scrollTo("#appointment")}
-              className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-8 text-base"
-            >
+            <Button size="lg" onClick={() => scrollTo("#appointment")} className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-8 text-base">
               Book Appointment
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => scrollTo("#about")}
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 text-base"
-            >
+            <Button size="lg" variant="outline" onClick={() => scrollTo("#about")} className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 text-base">
               Learn More
             </Button>
           </div>
         </motion.div>
 
-        {/* Right */}
         <motion.div
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
@@ -62,11 +67,7 @@ const HeroSection = () => {
         >
           <div className="relative">
             <div className="w-72 h-80 md:w-80 md:h-[28rem] rounded-2xl overflow-hidden shadow-2xl border-4 border-card">
-              <img
-                src={doctorImg}
-                alt="Dr. Sarah Mitchell, Senior Oncologist"
-                className="w-full h-full object-cover"
-              />
+              <img src={doctorImg} alt="Dr. Mitchell, Senior Oncologist" className="w-full h-full object-cover" />
             </div>
             <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-accent/20 rounded-full blur-2xl" />
             <div className="absolute -top-4 -right-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
@@ -74,7 +75,6 @@ const HeroSection = () => {
         </motion.div>
       </div>
 
-      {/* Stats */}
       <div className="container mx-auto px-4 pb-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats.map((stat, i) => (

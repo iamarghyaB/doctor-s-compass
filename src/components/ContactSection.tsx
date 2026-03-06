@@ -1,10 +1,27 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Phone, Mail, MapPin, Clock, Facebook, Linkedin, Youtube } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ContactSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
+  const [content, setContent] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    supabase.from("site_content").select("*").eq("section", "contact").then(({ data }) => {
+      if (data) {
+        const map: Record<string, string> = {};
+        data.forEach((d) => (map[d.key] = d.value));
+        setContent(map);
+      }
+    });
+  }, []);
+
+  const phone = content.phone || "+1 (555) 123-4567";
+  const email = content.email || "contact@drmitchell.care";
+  const address = content.address || "123 Medical Center Drive, Suite 400\nNew York, NY 10001";
+  const hours = content.hours || "Mon–Fri: 9:00 AM – 5:00 PM\nSat–Sun: Closed";
 
   return (
     <section id="contact" className="section-padding" ref={ref}>
@@ -16,7 +33,6 @@ const ContactSection = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 max-w-5xl mx-auto">
-          {/* Info */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -29,7 +45,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <h4 className="font-heading font-semibold text-primary">Phone</h4>
-                <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                <p className="text-muted-foreground">{phone}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -38,7 +54,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <h4 className="font-heading font-semibold text-primary">Email</h4>
-                <p className="text-muted-foreground">contact@drmitchell.care</p>
+                <p className="text-muted-foreground">{email}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -47,7 +63,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <h4 className="font-heading font-semibold text-primary">Address</h4>
-                <p className="text-muted-foreground">123 Medical Center Drive, Suite 400<br />New York, NY 10001</p>
+                <p className="text-muted-foreground whitespace-pre-line">{address}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -56,7 +72,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <h4 className="font-heading font-semibold text-primary">Working Hours</h4>
-                <p className="text-muted-foreground">Mon–Fri: 9:00 AM – 5:00 PM<br />Sat–Sun: Closed</p>
+                <p className="text-muted-foreground whitespace-pre-line">{hours}</p>
               </div>
             </div>
 
@@ -69,7 +85,6 @@ const ContactSection = () => {
             </div>
           </motion.div>
 
-          {/* Map */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
