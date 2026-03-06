@@ -122,8 +122,16 @@ const AdminDashboard = () => {
           );
           if (error) throw error;
         }
+      } else if (activeTab === "about") {
+        // Save both about and hero sections
+        const items = siteContent.filter((c) => c.section === "about" || c.section === "hero");
+        for (const item of items) {
+          await supabase.from("site_content").upsert(
+            { section: item.section, key: item.key, value: item.value },
+            { onConflict: "section,key" }
+          );
+        }
       } else {
-        // Save site_content for the active section
         const sectionItems = siteContent.filter((c) => c.section === activeTab);
         for (const item of sectionItems) {
           await supabase.from("site_content").upsert(
