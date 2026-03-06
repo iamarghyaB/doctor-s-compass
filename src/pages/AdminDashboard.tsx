@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Stethoscope, LogOut, Building2, Briefcase, Info, Phone, Plus, Trash2, Save, Loader2,
+  Stethoscope, LogOut, Building2, Briefcase, Info, Phone, Plus, Trash2, Save, Loader2, CalendarCheck,
 } from "lucide-react";
+import AppointmentsTab from "@/components/admin/AppointmentsTab";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Chamber = Tables<"chambers">;
@@ -16,6 +17,7 @@ type Service = Tables<"services">;
 type SiteContent = Tables<"site_content">;
 
 const tabs = [
+  { id: "appointments", label: "Appointments", icon: CalendarCheck },
   { id: "chambers", label: "Chambers", icon: Building2 },
   { id: "services", label: "Services", icon: Briefcase },
   { id: "about", label: "About", icon: Info },
@@ -28,7 +30,7 @@ const AdminDashboard = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<TabId>("chambers");
+  const [activeTab, setActiveTab] = useState<TabId>("appointments");
   const [saving, setSaving] = useState(false);
 
   // Data states
@@ -219,6 +221,9 @@ const AdminDashboard = () => {
               Save Changes
             </Button>
           </div>
+
+          {/* Appointments Tab */}
+          {activeTab === "appointments" && <AppointmentsTab />}
 
           {/* Chambers Tab */}
           {activeTab === "chambers" && (

@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Clock, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,13 +50,25 @@ const AppointmentSection = () => {
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const { error } = await supabase.from("appointments").insert({
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        preferred_date: format(data.date, "yyyy-MM-dd"),
+        service: data.service,
+        message: data.message || "",
+      });
+      if (error) throw error;
+      toast({
+        title: "Appointment Requested!",
+        description: `Thank you ${data.name}. We'll confirm your appointment for ${format(data.date, "PPP")} shortly.`,
+      });
+      form.reset();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
     setLoading(false);
-    toast({
-      title: "Appointment Requested!",
-      description: `Thank you ${data.name}. We'll confirm your appointment for ${format(data.date, "PPP")} shortly.`,
-    });
-    form.reset();
   };
 
   return (
