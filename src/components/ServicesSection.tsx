@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import {
   Search, Pill, Radiation, ShieldCheck, Stethoscope, HeartHandshake, type LucideIcon,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -50,10 +51,16 @@ const ServicesSection = () => {
                 </div>
                 <h3 className="font-heading text-lg font-semibold text-primary mb-2">{s.title}</h3>
                 <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{s.description}</p>
-                <button className="text-accent text-sm font-semibold hover:underline">Learn More →</button>
+                <Link to={`/services#${s.id}`} className="text-accent text-sm font-semibold hover:underline">Learn More →</Link>
               </motion.div>
             );
           })}
+        </div>
+
+        <div className="text-center mt-10">
+          <Link to="/services" className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold hover:opacity-90 transition-opacity">
+            View all services
+          </Link>
         </div>
       </div>
     </section>
