@@ -91,28 +91,49 @@ export type Database = {
       }
       services: {
         Row: {
+          benefits: Json
+          category: string
           created_at: string
           description: string
+          duration: string | null
+          faqs: Json
           icon: string
           id: string
+          image_url: string | null
+          long_description: string | null
+          price_info: string | null
           sort_order: number
           title: string
           updated_at: string
         }
         Insert: {
+          benefits?: Json
+          category?: string
           created_at?: string
           description: string
+          duration?: string | null
+          faqs?: Json
           icon?: string
           id?: string
+          image_url?: string | null
+          long_description?: string | null
+          price_info?: string | null
           sort_order?: number
           title: string
           updated_at?: string
         }
         Update: {
+          benefits?: Json
+          category?: string
           created_at?: string
           description?: string
+          duration?: string | null
+          faqs?: Json
           icon?: string
           id?: string
+          image_url?: string | null
+          long_description?: string | null
+          price_info?: string | null
           sort_order?: number
           title?: string
           updated_at?: string
